@@ -19,13 +19,26 @@ SKY = (176, 206, 222)
 MAPGREEN = (104, 138, 102)
 
 FD = "/usr/share/fonts/truetype/dejavu"
+FL = "/usr/share/fonts/truetype/liberation"
 
 
+# Font fallback chain: DejaVu -> Liberation -> DejaVuSans reguler ->
+# font default Pillow. Urutan ini penting: image grader (Python slim)
+# bisa tidak punya direktori DejaVu sama sekali, jadi F() tidak boleh
+# melempar OSError apa pun yang terjadi.
 def F(name, size):
     try:
         return ImageFont.truetype(os.path.join(FD, name), size)
     except OSError:
+        pass
+    try:
+        return ImageFont.truetype(os.path.join(FL, name), size)
+    except OSError:
+        pass
+    try:
         return ImageFont.truetype(os.path.join(FD, "DejaVuSans.ttf"), size)
+    except OSError:
+        return ImageFont.load_default()
 
 
 SERIF_B = "DejaVuSerif-Bold.ttf"
